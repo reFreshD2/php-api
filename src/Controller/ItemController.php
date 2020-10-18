@@ -13,12 +13,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 /**
- * @Route("/")
+ * @Route("/api")
  */
 class ItemController extends AbstractController
 {
     /**
-     * @Route("/api/{userId}/add", name="add", methods={"POST"})
+     * @Route("/{userId}/add", name="add", methods={"POST"})
      */
     public function add(Request $request)
     {
@@ -39,7 +39,7 @@ class ItemController extends AbstractController
     }
 
     /**
-     * @Route("/api/{userId}/show", name="show", methods={"GET"})
+     * @Route("/{userId}/show", name="show", methods={"GET"})
      */
     public function show(Request $request, ItemRepository $itemRepository)
     {
@@ -49,5 +49,19 @@ class ItemController extends AbstractController
             $result[] = ['userId' => $item->getUserId(), 'name' => $item->getName()];
         }
         return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/img", name="img", methods={"POST"})
+     */
+    public function img(Request $request)
+    {
+        $imgDir = dirname(__DIR__, 2) . '/img/';
+        $userfileName = $_FILES['img']['name'];
+        $name = mt_rand(0, 10000) . $userfileName;
+        if (move_uploaded_file($_FILES['img']['tmp_name'], $imgDir . $name)) {
+            return new JsonResponse([$userfileName => $imgDir . $name]);
+        }
+        return new JsonResponse(["error" => "failed to download $userfileName"]);
     }
 }
